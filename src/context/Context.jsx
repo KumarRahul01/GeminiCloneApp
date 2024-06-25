@@ -4,8 +4,6 @@ import run from "../config/gemini";
 export const Context = createContext();
 
 const ContextProvider = (props) => {
-
-
   const [input, setInput] = useState("");
   const [recentPrompt, setRecentPrompt] = useState("");
   const [prevPrompts, setPrevPrompts] = useState([]);
@@ -13,53 +11,57 @@ const ContextProvider = (props) => {
   const [loading, setLoading] = useState(false);
   const [resultData, setResultData] = useState("");
 
-  const delayPara = (index, nextWord) =>{
-    setTimeout(function(){
-      setResultData(prev => prev+nextWord)
-    }, 75*index)
-  }
+  const delayPara = (index, nextWord) => {
+    setTimeout(function () {
+      setResultData((prev) => prev + nextWord);
+    }, 75 * index);
+  };
 
-  const newChat = () =>{
+  const newChat = () => {
     setLoading(false);
     setShowResult(false);
-  }
-
+  };
 
   const onSent = async (prompt) => {
-
-    setResultData("")
+    setResultData("");
     setLoading(true);
     setShowResult(true);
     let response;
-    if(prompt !== undefined){
+    if (prompt !== undefined) {
       response = await run(prompt);
       setRecentPrompt(prompt);
-    }else{
-      setPrevPrompts(prev =>[...prev, input]);
+    } else {
+      setPrevPrompts((prev) => [...prev, input]);
       setRecentPrompt(input);
       response = await run(input);
     }
-    let responseArray = response.split("**");
-    let newResponse = "";
-    for(let i = 0; i < responseArray.length; i++) {
-
-      if(i === 0 || i%2 !== 1) {
-        newResponse += responseArray[i];
-    }else{
-      newResponse += "<b>"+ responseArray[i] + "</b>";
+    let hashArray = response.split("##");
+    let newModifiedArray = "";
+    for (let i = 0; i < hashArray.length; i++) {
+      if (i === 0 || i % 2 !== 1) {
+        newModifiedArray += hashArray[i];
+      } else {
+        newModifiedArray += `${hashArray[i]}</br>`;
+      }
     }
-  }
-    let newResponse2= newResponse.split("*").join("</br> </br>");
+    let responseArray = newModifiedArray.split("**");
+    let newResponse = "";
+    for (let i = 0; i < responseArray.length; i++) {
+      if (i === 0 || i % 2 !== 1) {
+        newResponse += responseArray[i];
+      } else {
+        newResponse += `<b>${responseArray[i]}</b>`;
+      }
+    }
+    let newResponse2 = newResponse.split("*").join("</br> </br>");
     let newResponseArray = newResponse2.split(" ");
     for (let i = 0; i < newResponseArray.length; i++) {
-      
       const nextWord = newResponseArray[i];
-      delayPara(i, nextWord+" ");
+      delayPara(i, nextWord + " ");
     }
     setLoading(false);
     setInput("");
   };
-
 
   const contextValue = {
     prevPrompts,
@@ -72,7 +74,7 @@ const ContextProvider = (props) => {
     resultData,
     input,
     setInput,
-    newChat
+    newChat,
   };
 
   return (

@@ -1,10 +1,57 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import "./Main.css";
 import { assets } from "../../assets/assets";
 import { Context } from "../../context/Context";
 
-
 const Main = () => {
+
+  
+  /* Uploading Image
+  const [img, setImage] = useState();
+
+  const handleImage = (e) => {
+    const imgUrl = URL.createObjectURL(e.target.files[0]);
+    let myImg = document.getElementById("image");
+    myImg.innerHTML = `<img id="rawImage" src="${imgUrl}" />`;
+
+    const imageUrl = ()=>{
+      const img = document.getElementById("rawImage");
+       console.log("image url is "+img.src);
+       setInput(img.src);
+     }
+    imageUrl();
+   };*/
+
+  const speechHandler = () => {
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Sorry, your browser doesn't support speech recognition.");
+    } else {
+      const recognition = new webkitSpeechRecognition();
+      recognition.continuous = false; // Recognize only one sentence
+      recognition.interimResults = true; // No partial results
+      recognition.lang = "en-US"; // Set the language
+
+      recognition.onstart = () => {
+        console.log("Listening...");
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+      };
+
+      recognition.onerror = (event) => {
+        console.log("Error occurred: " + event.error);
+      };
+
+      recognition.onend = () => {
+        console.log("Recognition ended.");
+      };
+
+      recognition.start();
+    }
+  };
+
   const {
     onSent,
     recentPrompt,
@@ -14,7 +61,6 @@ const Main = () => {
     setInput,
     input,
   } = useContext(Context);
-
 
   return (
     <div className="main">
@@ -92,11 +138,29 @@ const Main = () => {
               placeholder="Enter a prompt here"
             />
             <div>
-              <img src={assets.gallery_icon} alt="" />
-              <img onClick={()=>speechHandler()}
+              {/* <img src={assets.gallery_icon} alt="" /> */}
+              <img
+                onClick={() => speechHandler()}
                 src={assets.mic_icon}
                 alt=""
               />
+
+              {/* Uploading Image */}
+
+              {/* <input
+                onChange={(e) => handleImage(e)}
+                type="file"
+                accept="image/gif, image/jpeg, image/png"
+                name="image"
+                id="inputImage"
+              ></input>
+              <div>
+                <label htmlFor="inputImage"><img id="linkImg" src={assets.link_icon} alt="link" /></label>
+              </div>
+              <div id="image">{img}</div> */}
+
+              {/* Uploading Image Ends */}
+
               {input ? (
                 <img onClick={() => onSent()} src={assets.send_icon} alt="" />
               ) : null}
